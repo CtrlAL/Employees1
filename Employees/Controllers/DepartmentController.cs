@@ -40,5 +40,14 @@ namespace Employees.Controllers
 
             return Ok(result.Select(DepartmentModel.ToModel).ToList());
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<IList<DepartmentModel>>> GetList([FromRoute] int id)
+        {
+            var result = await _departmentRepository.GetAsync(id);
+
+            return result != null ? Ok(DepartmentModel.ToModel(result)) : NotFound();
+        }
     }
 }

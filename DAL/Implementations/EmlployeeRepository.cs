@@ -15,7 +15,7 @@ namespace DAL.Implementations
             _connection = connection;
         }
 
-        public async Task<Employee> GetAsync(int id)
+        public async Task<Employee?> GetAsync(int id)
         {
             const string sql = @"
                 SELECT 

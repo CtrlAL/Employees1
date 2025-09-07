@@ -14,7 +14,7 @@ namespace DAL.Implementations
             _connection = connection;
         }
 
-        public async Task<Company> GetAsync(int id)
+        public async Task<Company?> GetAsync(int id)
         {
             const string sql = "SELECT id, name FROM companies WHERE id = @Id";
             return await _connection.QueryFirstOrDefaultAsync<Company>(sql, new { Id = id });

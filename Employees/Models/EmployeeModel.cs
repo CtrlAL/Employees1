@@ -5,7 +5,7 @@ namespace Employees.Models
     public class EmployeeModel
     {
         public int Id { get; set; }
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
         public string? Name { get; set; }
         public string? Surname { get; set; }
         public string? Phone { get; set; }
@@ -20,9 +20,9 @@ namespace Employees.Models
                 Name = entity.Name,
                 Surname = entity.Surname,
                 Phone = entity.Phone,
-                CompanyId = entity.CompanyId,
-                Department = DepartmentModel.ToModel(entity.Department),
-                Passport = PassportModel.ToModel(entity.Passport),
+                CompanyId = entity.CompanyId.HasValue ? entity.CompanyId.Value : 0,
+                Department = entity.Department == null ? null : DepartmentModel.ToModel(entity.Department),
+                Passport =  entity.Passport == null ? null : PassportModel.ToModel(entity.Passport),
             };
         }
 

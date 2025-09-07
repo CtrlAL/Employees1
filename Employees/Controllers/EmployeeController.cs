@@ -48,7 +48,7 @@ namespace Employees.Controllers
         {
             var result = await _eployeeRepository.GetAsync(id);
 
-            return Ok(EmployeeModel.ToModel(result));
+            return  result != null ? Ok(EmployeeModel.ToModel(result)) : NotFound();
         }
 
         [HttpGet]
