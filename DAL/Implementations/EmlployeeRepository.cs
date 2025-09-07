@@ -115,27 +115,39 @@ namespace DAL.Implementations
 
         public async Task<int> CreateAsync(Employee employee)
         {
-            const string sql = @"
+            using var transaction = _connection.BeginTransaction();
+
+            try
+            {
+                const string insertEmployeeSql = @"
                 INSERT INTO employees (company_id, department_id, name, surname, phone)
-                VALUES (@CompanyId, @DeparmentId, @Name, @Surname, @Phone)
+                VALUES (@CompanyId, @DepartmentId, @Name, @Surname, @Phone)
                 RETURNING id;";
 
-            var newId = await _connection.QuerySingleAsync<int>(sql, employee);
+                var newId = await _connection.QuerySingleAsync<int>(insertEmployeeSql, employee, transaction);
 
-            if (employee.Passport != null)
-            {
+                if (employee.Passport == null)
+                    throw new InvalidOperationException("Passport is required.");
+
                 await _connection.ExecuteAsync(@"
-                    INSERT INTO passports (employee_id, type, number)
-                    VALUES (@EmployeeId, @Type, @Number);", new
+                INSERT INTO passports (employee_id, type, number)
+                VALUES (@EmployeeId, @Type, @Number);", new
                 {
                     EmployeeId = newId,
-                    employee.Passport.Type,
-                    employee.Passport.Number
-                });
-            }
+                    Type = employee.Passport.Type,
+                    Number = employee.Passport.Number
+                }, transaction);
 
-            employee.Id = newId;
-            return newId;
+                employee.Id = newId;
+
+                transaction.Commit();
+                return newId;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public async Task<bool> UpdateAsync(Employee employee)
