@@ -29,8 +29,8 @@ namespace DAL.Implementations
         public async Task<int> CreateAsync(Department department)
         {
             const string sql = @"
-                INSERT INTO departments (name, phone)
-                VALUES (@Name, @Phone)
+                INSERT INTO departments (name, phone, company_id)
+                VALUES (@Name, @Phone, @CompanyId)
                 RETURNING id;";
 
             var newId = await _connection.QuerySingleAsync<int>(sql, department);
