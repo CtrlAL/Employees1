@@ -16,22 +16,22 @@ namespace DAL.Implementations
 
             public async Task<Company> GetAsync(int id)
             {
-                const string sql = "SELECT Id, Name FROM Companies WHERE Id = @Id";
+                const string sql = "SELECT id, name FROM companies WHERE id = @Id";
                 return await _connection.QueryFirstOrDefaultAsync<Company>(sql, new { Id = id });
             }
 
             public async Task<IList<Company>> GetAsync(object query)
             {
-                const string sql = "SELECT Id, Name FROM Companies";
+                const string sql = "SELECT id, name FROM companies";
                 return (await _connection.QueryAsync<Company>(sql)).AsList();
             }
 
             public async Task<int> CreateAsync(Company company)
             {
                 const string sql = @"
-                INSERT INTO Companies (Name)
+                INSERT INTO companies (name)
                 VALUES (@Name)
-                RETURNING Id;";
+                RETURNING id;";
 
                 var newId = await _connection.QuerySingleAsync<int>(sql, company);
                 company.Id = newId;
@@ -41,9 +41,9 @@ namespace DAL.Implementations
             public async Task<bool> UpdateAsync(Company company)
             {
                 const string sql = @"
-                UPDATE Companies 
-                SET Name = @Name 
-                WHERE Id = @Id";
+                UPDATE companies 
+                SET name = @Name 
+                WHERE id = @Id";
 
                 var rowsAffected = await _connection.ExecuteAsync(sql, company);
                 return rowsAffected > 0;
@@ -51,7 +51,7 @@ namespace DAL.Implementations
 
             public async Task<bool> DeleteAsync(int id)
             {
-                const string sql = "DELETE FROM Companies WHERE Id = @Id";
+                const string sql = "DELETE FROM companies WHERE id = @Id";
                 var rowsAffected = await _connection.ExecuteAsync(sql, new { Id = id });
                 return rowsAffected > 0;
             }

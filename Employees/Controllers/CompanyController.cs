@@ -5,6 +5,8 @@ using QueryParams;
 
 namespace Employees.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class CompanyController : ControllerBase
     {
         private readonly ICompanyRepository _companyRepository;
@@ -49,10 +51,10 @@ namespace Employees.Controllers
         }
 
         [HttpGet]
-        [Route("filter")]
-        public async Task<ActionResult<IList<CompanyModel>>> GetList([FromQuery] EmployeesQueryParams queryParams)
+        [Route("list")]
+        public async Task<ActionResult<IList<CompanyModel>>> GetList()
         {
-            var result = await _companyRepository.GetAsync(queryParams);
+            var result = await _companyRepository.GetAsync(null);
 
             return Ok(result.Select(CompanyModel.ToModel).ToList());
         }

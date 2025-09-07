@@ -1,6 +1,5 @@
 ﻿using Employees.Models;
 using Microsoft.AspNetCore.Mvc;
-using DAL;
 using DAL.Interfaces;
 using QueryParams;
 
