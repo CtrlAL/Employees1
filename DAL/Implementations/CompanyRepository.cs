@@ -2,58 +2,60 @@
 using System.Data;
 using Dapper;
 using DAL.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DAL.Implementations
-{   
+{
     public class CompanyRepository : ICompanyRepository
+    {
+        private readonly IDbConnection _connection;
+
+        public CompanyRepository(IDbConnection connection)
         {
-            private readonly IDbConnection _connection;
+            _connection = connection;
+        }
 
-            public CompanyRepository(IDbConnection connection)
-            {
-                _connection = connection;
-            }
+        public async Task<Company> GetAsync(int id)
+        {
+            const string sql = "SELECT id, name FROM companies WHERE id = @Id";
+            return await _connection.QueryFirstOrDefaultAsync<Company>(sql, new { Id = id });
+        }
 
-            public async Task<Company> GetAsync(int id)
-            {
-                const string sql = "SELECT id, name FROM companies WHERE id = @Id";
-                return await _connection.QueryFirstOrDefaultAsync<Company>(sql, new { Id = id });
-            }
+        public async Task<IList<Company>> GetAsync(object query)
+        {
+            const string sql = "SELECT id, name FROM companies";
+            return (await _connection.QueryAsync<Company>(sql)).AsList();
+        }
 
-            public async Task<IList<Company>> GetAsync(object query)
-            {
-                const string sql = "SELECT id, name FROM companies";
-                return (await _connection.QueryAsync<Company>(sql)).AsList();
-            }
-
-            public async Task<int> CreateAsync(Company company)
-            {
-                const string sql = @"
+        public async Task<int> CreateAsync(Company company)
+        {
+            const string sql = @"
                 INSERT INTO companies (name)
                 VALUES (@Name)
                 RETURNING id;";
 
-                var newId = await _connection.QuerySingleAsync<int>(sql, company);
-                company.Id = newId;
-                return newId;
-            }
+            var newId = await _connection.QuerySingleAsync<int>(sql, company);
+            company.Id = newId;
+            return newId;
+        }
 
-            public async Task<bool> UpdateAsync(Company company)
-            {
-                const string sql = @"
+        public async Task<bool> UpdateAsync(Company company)
+        {
+            const string sql = @"
                 UPDATE companies 
                 SET name = @Name 
                 WHERE id = @Id";
 
-                var rowsAffected = await _connection.ExecuteAsync(sql, company);
-                return rowsAffected > 0;
-            }
-
-            public async Task<bool> DeleteAsync(int id)
-            {
-                const string sql = "DELETE FROM companies WHERE id = @Id";
-                var rowsAffected = await _connection.ExecuteAsync(sql, new { Id = id });
-                return rowsAffected > 0;
-            }
+            var rowsAffected = await _connection.ExecuteAsync(sql, company);
+            return rowsAffected > 0;
         }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            const string sql = "DELETE FROM companies WHERE id = @Id";
+            var rowsAffected = await _connection.ExecuteAsync(sql, new { Id = id });
+            return rowsAffected > 0;
+        }
+    }
 }
