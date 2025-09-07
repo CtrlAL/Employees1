@@ -5,9 +5,7 @@ using DAL.Interfaces;
 
 namespace DAL.Implementations
 {   
-    namespace DAL.Implementations
-    {
-        public class CompanyRepository : ICompanyRepository
+    public class CompanyRepository : ICompanyRepository
         {
             private readonly IDbConnection _connection;
 
@@ -58,5 +56,4 @@ namespace DAL.Implementations
                 return rowsAffected > 0;
             }
         }
-    }
 }

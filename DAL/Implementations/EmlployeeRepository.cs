@@ -6,9 +6,7 @@ using DAL.Interfaces;
 
 namespace DAL.Implementations
 {
-    namespace DAL.Implementations
-    {
-        public class EmployeeRepository : IEmlployeeRepository
+    public class EmployeeRepository : IEmlployeeRepository
         {
             private readonly IDbConnection _connection;
 
@@ -179,5 +177,4 @@ namespace DAL.Implementations
                 return rowsAffected > 0;
             }
         }
-    }
 }

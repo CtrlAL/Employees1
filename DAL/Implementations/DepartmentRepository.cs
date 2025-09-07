@@ -5,12 +5,7 @@ using DAL.Interfaces;
 
 namespace DAL.Implementations
 {
-    
-    
-
-    namespace DAL.Implementations
-    {
-        public class DepartmentRepository : IDepartmentRepository
+    public class DepartmentRepository : IDepartmentRepository
         {
             private readonly IDbConnection _connection;
 
@@ -61,5 +56,5 @@ namespace DAL.Implementations
                 return rowsAffected > 0;
             }
         }
-    }
+    
 }
