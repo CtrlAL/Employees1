@@ -21,7 +21,7 @@ namespace Employees.Models
                 Surname = model.Surname,
                 Phone = model.Phone,
                 CompanyId = model.CompanyId,
-                DeparmentId = model.DepartmentId,
+                DepartmentId = model.DepartmentId,
                 Passport = model.Passport == null ? null : PassportModel.ToEntity(model.Passport)
             };
         }
