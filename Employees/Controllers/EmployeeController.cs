@@ -17,14 +17,14 @@ namespace Employees.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Create([FromBody] EmployeeModel model)
+        public async Task<ActionResult<int>> Create([FromBody] CreateEmployeeModel model)
         {
-            var id = await _eployeeRepository.CreateAsync(EmployeeModel.ToEntity(model));
+            var id = await _eployeeRepository.CreateAsync(CreateEmployeeModel.ToEntity(model));
 
             return Ok(new { id });
         }
 
-        [HttpPost("{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<int>> Delete([FromRoute] int id)
         {
             var result = await _eployeeRepository.DeleteAsync(id);

@@ -5,12 +5,12 @@ namespace Employees.Models
     public class EmployeeModel
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Phone { get; set; }
         public int CompanyId { get; set; }
-        public DepartmentModel Department { get; set; }
-        public PassportModel Passport { get; set; }
+        public string? Name { get; set; }
+        public string? Surname { get; set; }
+        public string? Phone { get; set; }
+        public DepartmentModel? Department { get; set; }
+        public PassportModel? Passport { get; set; }
 
         public static EmployeeModel ToModel(Employee entity)
         {
@@ -28,11 +28,16 @@ namespace Employees.Models
 
         public static Employee ToEntity(EmployeeModel model)
         {
-            return new Employee(model.Id,
-                model.CompanyId,
-                model.Name,
-                model.Surname,
-                model.Phone);
+            return new Employee
+            {
+                Id = model.Id,
+                CompanyId = model.CompanyId,
+                Name = model.Name,
+                Surname = model.Surname,
+                Phone = model.Phone,
+                Department = model.Department == null ? null : DepartmentModel.ToEntity(model.Department),
+                Passport = model.Passport == null ? null : PassportModel.ToEntity(model.Passport),
+            };
         }
     }
 }

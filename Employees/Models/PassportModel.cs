@@ -17,7 +17,11 @@ namespace Employees.Models
 
         public static Passport ToEntity(PassportModel model)
         {
-            return new Passport(0, model.Type, model.Number);
+            return new Passport
+            {
+                Type = model.Type,
+                Number = model.Number,
+            };
         }
     }
 }

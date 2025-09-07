@@ -24,7 +24,7 @@ namespace Employees.Controllers
             return Ok(new { id });
         }
 
-        [HttpPost("{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<int>> Delete([FromRoute] int id)
         {
             var result = await _companyRepository.DeleteAsync(id);

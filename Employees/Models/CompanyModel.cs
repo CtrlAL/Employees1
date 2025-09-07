@@ -18,7 +18,11 @@ namespace Employees.Models
 
         public static Company ToEntity(CompanyModel model)
         {
-            return new Company(model.Id, model.Name);
+            return new Company
+            {
+                Id = model.Id,
+                Name = model.Name,
+            };
         }
     }
 }

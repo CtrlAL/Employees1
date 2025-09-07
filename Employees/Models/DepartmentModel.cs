@@ -5,6 +5,7 @@ namespace Employees.Models
     public class DepartmentModel
     {
         public int Id { get; set; }
+        public int CompanyId { get; set; }
         public string Name { get; set; }
         public string Phone { get; set; }
 
@@ -19,7 +20,13 @@ namespace Employees.Models
 
         public static Department ToEntity(DepartmentModel model)
         {
-            return new Department(model.Id, model.Name, model.Phone);
+            return new Department
+            {
+                Id = model.Id,
+                CompanyId = model.CompanyId,
+                Name = model.Name,
+                Phone = model.Phone,
+            };
         }
     }
 }

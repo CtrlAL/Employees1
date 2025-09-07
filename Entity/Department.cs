@@ -3,14 +3,9 @@
     public class Department
     {
         public int Id { get; set; }
+        public int CompanyId { get; set; }
         public string Name { get; set; }
         public string Phone { get; set; }
-
-        public Department(int id, string name, string phone)
-        {
-            Id = id;
-            Name = name;
-            Phone = phone;
-        }
+        public Company Company { get; set; }
     }
 }

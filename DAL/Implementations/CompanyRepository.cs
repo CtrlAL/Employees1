@@ -2,8 +2,6 @@
 using System.Data;
 using Dapper;
 using DAL.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DAL.Implementations
 {

@@ -107,7 +107,7 @@ namespace DAL.Implementations
                     return existingEmp;
                 },
                 parameters,
-                splitOn: "passport_id,department_id"
+                splitOn: "passport_id, department_id"
             );
 
             return employeeDictionary.Values.ToList();
@@ -116,8 +116,8 @@ namespace DAL.Implementations
         public async Task<int> CreateAsync(Employee employee)
         {
             const string sql = @"
-                INSERT INTO employees (company_id, name, surname, phone)
-                VALUES (@CompanyId, @Name, @Surname, @Phone)
+                INSERT INTO employees (company_id, department_id, name, surname, phone)
+                VALUES (@CompanyId, @DeparmentId, @Name, @Surname, @Phone)
                 RETURNING id;";
 
             var newId = await _connection.QuerySingleAsync<int>(sql, employee);
@@ -140,12 +140,48 @@ namespace DAL.Implementations
 
         public async Task<bool> UpdateAsync(Employee employee)
         {
-            const string sql = @"
-                UPDATE employees 
-                SET company_id = @CompanyId, name = @Name, surname = @Surname, phone = @Phone
-                WHERE id = @Id";
+            if (employee.Id <= 0)
+                return false;
 
-            var rowsAffected = await _connection.ExecuteAsync(sql, employee);
+            var setClauses = new List<string>();
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", employee.Id);
+
+            if (employee.CompanyId > 0)
+            {
+                setClauses.Add("company_id = @CompanyId");
+                parameters.Add("CompanyId", employee.CompanyId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(employee.Name))
+            {
+                setClauses.Add("name = @Name");
+                parameters.Add("Name", employee.Name);
+            }
+
+            if (!string.IsNullOrWhiteSpace(employee.Surname))
+            {
+                setClauses.Add("surname = @Surname");
+                parameters.Add("Surname", employee.Surname);
+            }
+
+            if (employee.Phone != null)
+            {
+                setClauses.Add("phone = @Phone");
+                parameters.Add("Phone", employee.Phone);
+            }
+
+            if (setClauses.Count == 0)
+            {
+                return true;
+            }
+
+            var sql = $@"
+            UPDATE employees 
+            SET {string.Join(", ", setClauses)}
+            WHERE id = @Id";
+
+            var rowsAffected = await _connection.ExecuteAsync(sql, parameters);
 
             if (rowsAffected == 0)
             {
@@ -155,9 +191,9 @@ namespace DAL.Implementations
             if (employee.Passport != null)
             {
                 var passportUpdateSql = @"
-                    UPDATE passports 
-                    SET type = @Type, number = @Number
-                    WHERE employee_id = @EmployeeId";
+                UPDATE passports 
+                SET type = @Type, number = @Number
+                WHERE employee_id = @EmployeeId";
 
                 var passportRowsAffected = await _connection.ExecuteAsync(passportUpdateSql, new
                 {
@@ -169,8 +205,8 @@ namespace DAL.Implementations
                 if (passportRowsAffected == 0)
                 {
                     await _connection.ExecuteAsync(@"
-                        INSERT INTO passports (employee_id, type, number)
-                        VALUES (@EmployeeId, @Type, @Number);", new
+                    INSERT INTO passports (employee_id, type, number)
+                    VALUES (@EmployeeId, @Type, @Number);", new
                     {
                         employee.Passport.Type,
                         employee.Passport.Number,
