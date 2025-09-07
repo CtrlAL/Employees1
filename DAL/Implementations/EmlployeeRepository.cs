@@ -192,12 +192,16 @@ namespace DAL.Implementations
                 return true;
             }
 
-            var sql = $@"
-            UPDATE employees 
-            SET {string.Join(", ", setClauses)}
-            WHERE id = @Id";
+            if (setClauses.Count > 0)
+            {
+                var sql = $@"
+                UPDATE employees 
+                SET {string.Join(", ", setClauses)}
+                WHERE id = @Id";
 
-            rowsAffected += await _connection.ExecuteAsync(sql, parameters);
+                rowsAffected += await _connection.ExecuteAsync(sql, parameters);
+            }
+            
             rowsAffected += await UpsertPassportAsync(employee.Id, employee.Passport);
             rowsAffected += await UpdateDepartmentAsync(employee.Id, employee.Department);
 
