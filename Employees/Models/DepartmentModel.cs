@@ -7,7 +7,7 @@ namespace Employees.Models
         public string Name { get; set; }
         public string Phone { get; set; }
 
-        public static DepartmentModel FromEntity(Department entity)
+        public static DepartmentModel ToModel(Department entity)
         {
             return new DepartmentModel
             {

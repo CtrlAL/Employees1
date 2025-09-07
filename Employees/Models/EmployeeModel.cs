@@ -21,8 +21,8 @@ namespace Employees.Models
                 Surname = entity.Surname,
                 Phone = entity.Phone,
                 CompanyId = entity.CompanyId,
-                Department = DepartmentModel.FromEntity(entity.Department),
-                Passport = PassportModel.FromEntity(entity.Passport),
+                Department = DepartmentModel.ToModel(entity.Department),
+                Passport = PassportModel.ToModel(entity.Passport),
             };
         }
 

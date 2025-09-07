@@ -6,7 +6,7 @@ namespace Employees.Models
     {
         public string Type { get; set; }
         public string Number { get; set; }
-        public static PassportModel FromEntity(Passport entity)
+        public static PassportModel ToModel(Passport entity)
         {
             return new PassportModel
             {
