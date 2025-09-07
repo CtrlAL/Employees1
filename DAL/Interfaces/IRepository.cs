@@ -4,8 +4,8 @@
     {
         public Task<TEnity> GetAsync(TId id);
         public Task<IList<TEnity>> GetAsync(TQuery query);
-        public Task<TId> CreateAsync(TEnity id);
-        public Task<TId> UpdateAsync(TEnity id);
-        public Task<TEnity> DeleteAsync(TId id);
+        public Task<TId> CreateAsync(TEnity enity);
+        public Task<bool> UpdateAsync(TEnity enity);
+        public Task<bool> DeleteAsync(TId id);
     }
 }
