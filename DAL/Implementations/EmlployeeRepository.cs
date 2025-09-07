@@ -140,6 +140,8 @@ namespace DAL.Implementations
 
         public async Task<bool> UpdateAsync(Employee employee)
         {
+            var rowsAffected = 0;
+
             if (employee.Id <= 0)
                 return false;
 
@@ -181,12 +183,7 @@ namespace DAL.Implementations
             SET {string.Join(", ", setClauses)}
             WHERE id = @Id";
 
-            var rowsAffected = await _connection.ExecuteAsync(sql, parameters);
-
-            if (rowsAffected == 0)
-            {
-                return false;
-            }
+            rowsAffected += await _connection.ExecuteAsync(sql, parameters);
 
             if (employee.Passport != null)
             {
@@ -204,7 +201,7 @@ namespace DAL.Implementations
 
                 if (passportRowsAffected == 0)
                 {
-                    await _connection.ExecuteAsync(@"
+                    passportRowsAffected += await _connection.ExecuteAsync(@"
                     INSERT INTO passports (employee_id, type, number)
                     VALUES (@EmployeeId, @Type, @Number);", new
                     {
@@ -213,6 +210,33 @@ namespace DAL.Implementations
                         EmployeeId = employee.Id
                     });
                 }
+            }
+
+            if (employee.Department != null)
+            {
+                var currentDepartmentId = await _connection.QueryFirstOrDefaultAsync<int?>(@"
+                SELECT department_id 
+                FROM employees 
+                WHERE id = @EmployeeId", new { EmployeeId = employee.Id });
+
+                var departmentUpdateSql = @"
+                UPDATE departments 
+                SET name = @Name, phone = @Phone
+                WHERE id = @DepartmentId";
+
+                var departmentRowsAffected = await _connection.ExecuteAsync(departmentUpdateSql, new
+                {
+                    Name = employee.Department.Name,
+                    Phone = employee.Department.Phone,
+                    DepartmentId = currentDepartmentId
+                });
+
+                rowsAffected += departmentRowsAffected;
+            }
+
+            if (rowsAffected == 0)
+            {
+                return false;
             }
 
             return true;

@@ -7,12 +7,8 @@ namespace DAL.Migrations
     {
         public override void Up()
         {
-            Alter.Column("departments")
-                .OnTable("company_id")
-                .AsInt32();
-
-            Alter.Table("employees")
-                .AddColumn("department_id").AsInt32();
+            Alter.Table("departments")
+                .AddColumn("company_id").AsInt32();
 
             Alter.Table("employees")
                 .AddColumn("passport_id").AsInt32();
@@ -20,10 +16,6 @@ namespace DAL.Migrations
             Create.ForeignKey("fk_departments_company")
                 .FromTable("departments").ForeignColumn("company_id")
                 .ToTable("companies").PrimaryColumn("id");
-
-            Create.ForeignKey("fk_employees_department")
-                .FromTable("employees").ForeignColumn("department_id")
-                .ToTable("departments").PrimaryColumn("id");
 
             Create.ForeignKey("fk_employees_passport")
                 .FromTable("employees").ForeignColumn("passport_id")
@@ -33,11 +25,9 @@ namespace DAL.Migrations
         public override void Down()
         {
             Delete.ForeignKey("fk_employees_passport").OnTable("employees");
-            Delete.ForeignKey("fk_employees_department").OnTable("employees");
             Delete.ForeignKey("fk_departments_company").OnTable("departments");
 
             Delete.Column("passport_id").FromTable("employees");
-            Delete.Column("department_id").FromTable("employees");
             Delete.Column("company_id").FromTable("departments");
         }
     }
