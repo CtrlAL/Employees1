@@ -40,12 +40,25 @@ namespace DAL.Implementations
 
         public async Task<bool> UpdateAsync(Company company)
         {
-            const string sql = @"
-                UPDATE companies 
-                SET name = @Name 
-                WHERE id = @Id";
+            var setClauses = new List<string>();
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", company.Id);
 
-            var rowsAffected = await _connection.ExecuteAsync(sql, company);
+            if (company.Name != null)
+            {
+                setClauses.Add("name = @Name");
+                parameters.Add("Name", company.Name);
+            }
+
+            if (setClauses.Count == 0)
+                return true;
+
+            var sql = $@"
+            UPDATE companies 
+            SET {string.Join(", ", setClauses)}
+            WHERE id = @Id";
+
+            var rowsAffected = await _connection.ExecuteAsync(sql, parameters);
             return rowsAffected > 0;
         }
 
