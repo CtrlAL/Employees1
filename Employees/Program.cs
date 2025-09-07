@@ -1,3 +1,5 @@
+using Npgsql;
+using System.Data;
 
 namespace Employees
 {
@@ -7,16 +9,19 @@ namespace Employees
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddScoped<IDbConnection>(sp =>
+            {
+                var conn = new NpgsqlConnection(builder.Configuration["ConnectionStrings:DefaultConnectionString"]);
+                conn.Open();
+                return conn;
+            });
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
