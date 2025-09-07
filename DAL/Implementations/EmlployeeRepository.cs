@@ -185,7 +185,9 @@ namespace DAL.Implementations
                 parameters.Add("Phone", employee.Phone);
             }
 
-            if (setClauses.Count == 0)
+            if (setClauses.Count == 0 
+                && employee.Passport == null 
+                && employee.Department == null)
             {
                 return true;
             }
@@ -196,55 +198,8 @@ namespace DAL.Implementations
             WHERE id = @Id";
 
             rowsAffected += await _connection.ExecuteAsync(sql, parameters);
-
-            if (employee.Passport != null)
-            {
-                var passportUpdateSql = @"
-                UPDATE passports 
-                SET type = @Type, number = @Number
-                WHERE employee_id = @EmployeeId";
-
-                var passportRowsAffected = await _connection.ExecuteAsync(passportUpdateSql, new
-                {
-                    employee.Passport.Type,
-                    employee.Passport.Number,
-                    EmployeeId = employee.Id
-                });
-
-                if (passportRowsAffected == 0)
-                {
-                    passportRowsAffected += await _connection.ExecuteAsync(@"
-                    INSERT INTO passports (employee_id, type, number)
-                    VALUES (@EmployeeId, @Type, @Number);", new
-                    {
-                        employee.Passport.Type,
-                        employee.Passport.Number,
-                        EmployeeId = employee.Id
-                    });
-                }
-            }
-
-            if (employee.Department != null)
-            {
-                var currentDepartmentId = await _connection.QueryFirstOrDefaultAsync<int?>(@"
-                SELECT department_id 
-                FROM employees 
-                WHERE id = @EmployeeId", new { EmployeeId = employee.Id });
-
-                var departmentUpdateSql = @"
-                UPDATE departments 
-                SET name = @Name, phone = @Phone
-                WHERE id = @DepartmentId";
-
-                var departmentRowsAffected = await _connection.ExecuteAsync(departmentUpdateSql, new
-                {
-                    Name = employee.Department.Name,
-                    Phone = employee.Department.Phone,
-                    DepartmentId = currentDepartmentId
-                });
-
-                rowsAffected += departmentRowsAffected;
-            }
+            rowsAffected += await UpsertPassportAsync(employee.Id, employee.Passport);
+            rowsAffected += await UpdateDepartmentAsync(employee.Id, employee.Department);
 
             if (rowsAffected == 0)
             {
@@ -252,6 +207,75 @@ namespace DAL.Implementations
             }
 
             return true;
+        }
+
+        public async Task<int> UpsertPassportAsync(int employeeId, Passport? passport)
+        {
+            if (passport == null)
+                return 0;
+
+            const string updateSql = @"
+            UPDATE passports 
+            SET 
+                type = CASE WHEN @Type IS NOT NULL THEN @Type ELSE type END,
+                number = CASE WHEN @Number IS NOT NULL THEN @Number ELSE number END
+            WHERE employee_id = @EmployeeId";
+
+            var rowsAffected = await _connection.ExecuteAsync(updateSql, new
+            {
+                Type = passport.Type,
+                Number = passport.Number,
+                EmployeeId = employeeId
+            });
+
+            if (rowsAffected == 0)
+            {
+                const string insertSql = @"
+                INSERT INTO passports (employee_id, type, number)
+                VALUES (@EmployeeId, @Type, @Number)";
+
+                return await _connection.ExecuteAsync(insertSql, new
+                {
+                    Type = passport.Type,
+                    Number = passport.Number,
+                    EmployeeId = employeeId
+                });
+            }
+
+            return rowsAffected;
+        }
+
+        public async Task<int> UpdateDepartmentAsync(int employeeId, Department? department)
+        {
+            if (department == null)
+                return 0;
+
+            var currentDepartmentId = await _connection.QueryFirstOrDefaultAsync<int?>(@"
+            SELECT department_id 
+            FROM employees 
+            WHERE id = @EmployeeId", new { EmployeeId = employeeId });
+
+            if (!currentDepartmentId.HasValue)
+                throw new InvalidOperationException($"Employee {employeeId} is not assigned to any department.");
+
+            const string updateSql = @"
+            UPDATE departments 
+            SET 
+                name = CASE WHEN @Name IS NOT NULL THEN @Name ELSE name END,
+                phone = CASE WHEN @Phone IS NOT NULL THEN @Phone ELSE phone END
+            WHERE id = @DepartmentId";
+
+            var rowsAffected = await _connection.ExecuteAsync(updateSql, new
+            {
+                Name = department.Name,
+                Phone = department.Phone,
+                DepartmentId = currentDepartmentId.Value
+            });
+
+            if (rowsAffected == 0)
+                throw new InvalidOperationException($"Department with ID {currentDepartmentId} not found.");
+
+            return rowsAffected;
         }
 
         public async Task<bool> DeleteAsync(int id)
