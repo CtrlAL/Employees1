@@ -1,5 +1,4 @@
-using Npgsql;
-using System.Data;
+using DAL.Extensions;
 
 namespace Employees
 {
@@ -13,12 +12,7 @@ namespace Employees
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddScoped<IDbConnection>(sp =>
-            {
-                var conn = new NpgsqlConnection(builder.Configuration["ConnectionStrings:DefaultConnectionString"]);
-                conn.Open();
-                return conn;
-            });
+            builder.Services.UseDal(builder.Configuration);
 
             var app = builder.Build();
 
