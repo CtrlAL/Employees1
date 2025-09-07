@@ -44,7 +44,7 @@ namespace Employees.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<EmployeeModel>> Get([FromRoute] int id, [FromQuery] EmployeesQueryParams queryParams)
+        public async Task<ActionResult<EmployeeModel>> Get([FromRoute] int id)
         {
             var result = await _eployeeRepository.GetAsync(id);
 

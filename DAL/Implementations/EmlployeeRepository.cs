@@ -74,6 +74,7 @@ namespace DAL.Implementations
                     d.phone AS department_phone
                 FROM employees e
                 LEFT JOIN passports p ON e.id = p.employee_id
+                LEFT JOIN companies c ON e.company_id = c.id
                 LEFT JOIN departments d ON e.department_id = d.id
                 WHERE 1=1";
 
@@ -89,6 +90,18 @@ namespace DAL.Implementations
             {
                 sql += " AND e.department_id = @DepartmentId";
                 parameters.Add("DepartmentId", query.DepartmentId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                sql += " AND c.name = @CompanyName";
+                parameters.Add("CompanyName", query.CompanyName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.DepartmentName))
+            {
+                sql += " AND d.name = @DepartmentName";
+                parameters.Add("DepartmentName", query.DepartmentName);
             }
 
             var employeeDictionary = new Dictionary<int, Employee>();
