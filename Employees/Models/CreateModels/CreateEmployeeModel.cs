@@ -1,6 +1,6 @@
 ﻿using Entity;
 
-namespace Employees.Models
+namespace Employees.Models.CreateModels
 {
     public class CreateEmployeeModel
     {
