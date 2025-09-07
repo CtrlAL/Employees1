@@ -1,5 +1,6 @@
 ﻿using DAL.Interfaces;
 using Employees.Models;
+using Employees.Models.CreateModels;
 using Microsoft.AspNetCore.Mvc;
 using QueryParams;
 
@@ -17,9 +18,9 @@ namespace Employees.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Create([FromBody] DepartmentModel model)
+        public async Task<ActionResult<int>> Create([FromBody] CreateDepartmentModel model)
         {
-            var id = await _departmentRepository.CreateAsync(DepartmentModel.ToEntity(model));
+            var id = await _departmentRepository.CreateAsync(CreateDepartmentModel.ToEntity(model));
 
             return Ok(new { id });
         }

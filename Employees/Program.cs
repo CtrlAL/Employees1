@@ -1,4 +1,5 @@
 using DAL.Extensions;
+using Employees.ExceptionFilters;
 
 namespace Employees
 {
@@ -8,7 +9,11 @@ namespace Employees
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<DatabaseExceptionFilter>();
+            });
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -23,12 +28,8 @@ namespace Employees
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }
